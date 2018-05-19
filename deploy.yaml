@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: goecho
+  namespace: duck
+  labels:
+    app: goecho
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: goecho
+  template:
+    metadata:
+      labels:
+        app: goecho
+    spec:
+      containers:
+      - name: duck
+        image: c6h3un/goecho:0.3
+        ports:
+        - containerPort: 8888
