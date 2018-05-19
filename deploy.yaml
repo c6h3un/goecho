@@ -17,6 +17,6 @@ spec:
     spec:
       containers:
       - name: duck
-        image: c6h3un/goecho:0.3
+        image: c6h3un/goecho:0.4
         ports:
         - containerPort: 8888
