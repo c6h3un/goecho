@@ -1,10 +1,16 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"net"
 	"net/http"
 	"os"
+)
+
+// listen port
+var (
+	PORT = flag.String("p", "8888", "service port")
 )
 
 // GetLocalIP returns the non loopback local IP of the host
@@ -32,6 +38,9 @@ func handler(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
+	flag.Parse()
+	fmt.Println("server starting on port ", *PORT)
+
 	http.HandleFunc("/", handler)
-	http.ListenAndServe(":8888", nil)
+	http.ListenAndServe(":"+*PORT, nil)
 }
