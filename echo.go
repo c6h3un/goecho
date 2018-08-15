@@ -32,9 +32,9 @@ func GetLocalIP() string {
 
 func handler(w http.ResponseWriter, r *http.Request) {
 	hostname, _ := os.Hostname()
-	fmt.Fprintf(w, "You are from %s, ", r.RemoteAddr)
-	fmt.Fprintf(w, "this is %s ", GetLocalIP())
-	fmt.Fprintf(w, "(%s)", hostname)
+	//fmt.Fprintf(w, "You are from %s, ", r.RemoteAddr)
+	fmt.Fprintf(w, "This is %s ", GetLocalIP())
+	fmt.Fprintf(w, "(%s)\n", hostname)
 }
 
 func main() {
