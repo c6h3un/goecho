@@ -15,6 +15,7 @@ RUN CGO_ENABLED=0 GOOS=linux go install -installsuffix cgo github.com/c6h3un/ech
 
 FROM alpine:latest
 #RUN apk --no-cache add ca-certificates
+RUN apk add --no-cache curl
 RUN addgroup -g 1000 -S app && adduser -u 1000 -S -G app app 
 USER 1000
 WORKDIR /opt/bin/
