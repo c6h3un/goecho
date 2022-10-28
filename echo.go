@@ -3,9 +3,12 @@ package main
 import (
 	"flag"
 	"fmt"
+	"io/ioutil"
+	"log"
 	"net"
 	"net/http"
 	"os"
+	"time"
 )
 
 // listen port
@@ -42,5 +45,25 @@ func main() {
 	fmt.Println("server starting on port ", *PORT)
 
 	http.HandleFunc("/", handler)
+	http.HandleFunc("/dumpPacket", dumpPacket)
+	http.HandleFunc("/waitSeconds", waitSeconds)
 	http.ListenAndServe(":"+*PORT, nil)
+}
+
+func dumpPacket(w http.ResponseWriter, r *http.Request) {
+	hostname, _ := os.Hostname()
+	defer r.Body.Close()
+
+	body, err := ioutil.ReadAll(r.Body)
+
+	if err != nil {
+
+		log.Fatal(err)
+	}
+	fmt.Fprintf(w, "Hello, this is %s\n\n%s %s %s\nHost: %s\n%s", hostname, r.Method, r.URL, r.Proto, r.Host, string(body))
+}
+
+func waitSeconds(w http.ResponseWriter, r *http.Request) {
+	time.Sleep(26 * time.Second)
+	fmt.Fprintf(w, "200 OK")
 }

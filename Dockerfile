@@ -1,14 +1,17 @@
 # Start from a Debian image with the latest version of Go installed
 # and a workspace (GOPATH) configured at /go.
-FROM golang:1.10.2 as builder
+FROM golang:1.17.7 as builder
 
+WORKDIR /go/src/github.com/c6h3un/echogo
 # Copy the local package files to the container's workspace.
-ADD . /go/src/github.com/c6h3un/echogo
+ADD echo.go .
+ADD go.mod .
+ADD go.sum .
 
 # Build the outyet command inside the container.
 # (You may fetch or manage dependencies here,
 # either manually or with a tool like "godep".)
-RUN CGO_ENABLED=0 GOOS=linux go install -installsuffix cgo github.com/c6h3un/echogo
+RUN CGO_ENABLED=0 go build -o /go/bin/echogo . 
 
 # Run the outyet command by default when the container starts.
 #ENTRYPOINT /go/bin/echogo
