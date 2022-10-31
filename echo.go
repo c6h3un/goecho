@@ -60,7 +60,10 @@ func dumpPacket(w http.ResponseWriter, r *http.Request) {
 
 		log.Fatal(err)
 	}
-	fmt.Fprintf(w, "Hello, this is %s\n\n%s %s %s\nHost: %s\n%s", hostname, r.Method, r.URL, r.Proto, r.Host, string(body))
+	fmt.Fprintf(w, "Hello, this is %s\n\n%s %s %s\nHost: %s\nBody:\n%s\nHeaders:\n", hostname, r.Method, r.URL, r.Proto, r.Host, string(body))
+	for k, v := range r.Header {
+		fmt.Fprintf(w, "\t%v: %v\n", k, v)
+	}
 }
 
 func waitSeconds(w http.ResponseWriter, r *http.Request) {
