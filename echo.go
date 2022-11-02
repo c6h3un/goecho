@@ -44,7 +44,7 @@ func main() {
 	flag.Parse()
 	fmt.Println("server starting on port ", *PORT)
 
-	http.HandleFunc("/", handler)
+	http.HandleFunc("/info", handler)
 	http.HandleFunc("/dumpPacket", dumpPacket)
 	http.HandleFunc("/waitSeconds", waitSeconds)
 	http.ListenAndServe(":"+*PORT, nil)
