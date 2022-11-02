@@ -8,6 +8,7 @@ import (
 	"net"
 	"net/http"
 	"os"
+	"strings"
 	"time"
 )
 
@@ -47,6 +48,9 @@ func main() {
 	http.HandleFunc("/info", handler)
 	http.HandleFunc("/dumpPacket", dumpPacket)
 	http.HandleFunc("/waitSeconds", waitSeconds)
+	http.HandleFunc("/health", ok)
+	http.HandleFunc("/ready", ok)
+	http.HandleFunc("/echo/", echo)
 	http.ListenAndServe(":"+*PORT, nil)
 }
 
@@ -69,4 +73,12 @@ func dumpPacket(w http.ResponseWriter, r *http.Request) {
 func waitSeconds(w http.ResponseWriter, r *http.Request) {
 	time.Sleep(26 * time.Second)
 	fmt.Fprintf(w, "200 OK")
+}
+
+func ok(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintf(w, "OK")
+}
+
+func echo(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintf(w, strings.TrimPrefix(r.RequestURI, "/echo/"))
 }
