@@ -53,7 +53,7 @@ func main() {
 	http.HandleFunc("/ready", ok)
 	http.HandleFunc("/echo/", echo)
 	if *ENABLE_TLS {
-		http.ListenAndServeTLS(":"+*PORT, "server.crt", "server.key", nil)
+		http.ListenAndServeTLS(":"+*PORT, "tls/server.crt", "tls/server.key", nil)
 	}else{
 		http.ListenAndServe(":"+*PORT, nil)
 	}
