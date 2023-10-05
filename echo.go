@@ -15,6 +15,7 @@ import (
 // listen port
 var (
 	PORT = flag.String("p", "8888", "service port")
+	ENABLE_TLS = flag.Bool("tls.enable", false, "enable tls")
 )
 
 // GetLocalIP returns the non loopback local IP of the host
@@ -51,7 +52,11 @@ func main() {
 	http.HandleFunc("/health", ok)
 	http.HandleFunc("/ready", ok)
 	http.HandleFunc("/echo/", echo)
-	http.ListenAndServe(":"+*PORT, nil)
+	if *ENABLE_TLS {
+		http.ListenAndServeTLS(":"+*PORT, "server.crt", "server.key", nil)
+	}else{
+		http.ListenAndServe(":"+*PORT, nil)
+	}
 }
 
 func dumpPacket(w http.ResponseWriter, r *http.Request) {
