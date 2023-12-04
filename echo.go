@@ -10,6 +10,7 @@ import (
 	"os"
 	"strings"
 	"time"
+	"html/template"
 )
 
 // listen port
@@ -45,7 +46,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
 func main() {
 	flag.Parse()
 	fmt.Println("server starting on port ", *PORT)
-
+	http.HandleFunc("/", templatePage)
 	http.HandleFunc("/info", handler)
 	http.HandleFunc("/dumpPacket", dumpPacket)
 	http.HandleFunc("/waitSeconds", waitSeconds)
@@ -86,4 +87,58 @@ func ok(w http.ResponseWriter, r *http.Request) {
 
 func echo(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, strings.TrimPrefix(r.RequestURI, "/echo/"))
+}
+
+func templatePage(w http.ResponseWriter, r *http.Request) {
+	// hostname, _ := os.Hostname()
+	background := os.Getenv("BG_COLOR") // https://www.w3schools.com/colors/colors_names.asp
+	if len(background) == 0 {
+		background = "LightGray"
+	}
+	tpl := `
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>{{.Title}}</title>
+	</head>
+	<body style="background-color:`+background+`;">
+		{{range .Items}}<div>{{ . }}</div>{{else}}<div><strong>no rows</strong></div>{{end}}
+	</body>
+</html>`
+
+	check := func(err error) {
+		if err != nil {
+			log.Fatal(err)
+		}
+	}
+	t, err := template.New("webpage").Parse(tpl)
+	check(err)
+	appName := os.Getenv("APP_NAME")
+	appMessage := os.Getenv("APP_MESSAGE")
+	data := struct {
+		Title string
+		Items []string
+	}{
+		Title: appName,
+		Items: []string{
+			// hostname,
+			GetLocalIP(),
+			appMessage,
+		},
+	}
+
+	err = t.Execute(w, data)
+	check(err)
+
+	// noItems := struct {
+	// 	Title string
+	// 	Items []string
+	// }{
+	// 	Title: "My another page",
+	// 	Items: []string{},
+	// }
+
+	// err = t.Execute(os.Stdout, noItems)
+	// check(err)
 }
