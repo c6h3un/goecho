@@ -90,7 +90,7 @@ func echo(w http.ResponseWriter, r *http.Request) {
 }
 
 func templatePage(w http.ResponseWriter, r *http.Request) {
-	// hostname, _ := os.Hostname()
+	hostname, _ := os.Hostname()
 	background := os.Getenv("BG_COLOR") // https://www.w3schools.com/colors/colors_names.asp
 	if len(background) == 0 {
 		background = "LightGray"
@@ -122,7 +122,7 @@ func templatePage(w http.ResponseWriter, r *http.Request) {
 	}{
 		Title: appName,
 		Items: []string{
-			// hostname,
+			hostname,
 			GetLocalIP(),
 			appMessage,
 		},
