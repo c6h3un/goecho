@@ -3,19 +3,19 @@ package main
 import (
 	"flag"
 	"fmt"
-	"io/ioutil"
+	"html/template"
+	"io"
 	"log"
 	"net"
 	"net/http"
 	"os"
 	"strings"
 	"time"
-	"html/template"
 )
 
 // listen port
 var (
-	PORT = flag.String("p", "8888", "service port")
+	PORT       = flag.String("p", "8888", "service port")
 	ENABLE_TLS = flag.Bool("tls.enable", false, "enable tls")
 )
 
@@ -53,9 +53,10 @@ func main() {
 	http.HandleFunc("/health", ok)
 	http.HandleFunc("/ready", ok)
 	http.HandleFunc("/echo/", echo)
+	http.HandleFunc("/hostname", handler)
 	if *ENABLE_TLS {
 		http.ListenAndServeTLS(":"+*PORT, "tls/server.crt", "tls/server.key", nil)
-	}else{
+	} else {
 		http.ListenAndServe(":"+*PORT, nil)
 	}
 }
@@ -64,13 +65,14 @@ func dumpPacket(w http.ResponseWriter, r *http.Request) {
 	hostname, _ := os.Hostname()
 	defer r.Body.Close()
 
-	body, err := ioutil.ReadAll(r.Body)
+	body, err := io.ReadAll(r.Body)
 
 	if err != nil {
 
 		log.Fatal(err)
 	}
-	fmt.Fprintf(w, "Hello, this is %s\n\n%s %s %s\nHost: %s\nBody:\n%s\nHeaders:\n", hostname, r.Method, r.URL, r.Proto, r.Host, string(body))
+
+	fmt.Fprintf(w, "Hello, this is %s\n\n%s %s %s\nClient: %s\nHost: %s\nBody:\n%s\nHeaders:\n", hostname, r.Method, r.URL, r.Proto, r.RemoteAddr, r.Host, string(body))
 	for k, v := range r.Header {
 		fmt.Fprintf(w, "\t%v: %v\n", k, v)
 	}
@@ -86,7 +88,7 @@ func ok(w http.ResponseWriter, r *http.Request) {
 }
 
 func echo(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, strings.TrimPrefix(r.RequestURI, "/echo/"))
+	fmt.Fprint(w, strings.TrimPrefix(r.RequestURI, "/echo/"))
 }
 
 func templatePage(w http.ResponseWriter, r *http.Request) {
@@ -102,7 +104,7 @@ func templatePage(w http.ResponseWriter, r *http.Request) {
 		<meta charset="UTF-8">
 		<title>{{.Title}}</title>
 	</head>
-	<body style="background-color:`+background+`;">
+	<body style="background-color:` + background + `;">
 		{{range .Items}}<div>{{ . }}</div>{{else}}<div><strong>no rows</strong></div>{{end}}
 	</body>
 </html>`
